@@ -1,0 +1,5 @@
+click
+pyyaml
+requests==2.26.0
+PyGithub==1.59.1
+lpthw.web==1.1

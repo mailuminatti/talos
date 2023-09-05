@@ -1,0 +1,13 @@
+name: myapp
+
+type: microservice
+
+ci: 
+  name: gihub
+  organization: miluminatti-org
+
+target: 
+  name: portainerce
+  portainer_url: https://192.168.0.101:9443/ #https://portainer.miluminatti.com
+  portainer_username: martin
+  portainer_password: 'm55T*tw^QL5H'
