@@ -1,0 +1,4 @@
+version: "3"
+services:
+  hello_world:
+    image: hello-world
