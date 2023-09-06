@@ -14,12 +14,13 @@ ci:
   name: gihub
   organization: miluminatti-org
 
-target: 
-  name: portainerce
-  portainer_url: https://portainer.miluminatti.com
-  portainer_username: martin
-  portainer_password: 'm55T*tw^QL5H'
-  portainer_endpoint_id: 2
+deployment:
+  target: 
+    name: portainerce
+    portainer_url: https://portainer.miluminatti.com
+    portainer_username: martin
+    portainer_password: 'm55T*tw^QL5H'
+    portainer_endpoint_id: 2
 
 build:
   sca:
