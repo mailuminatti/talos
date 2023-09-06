@@ -15,10 +15,11 @@ def cli_deploy():
     pass
 
 @click.command()
-def deploy():
+@click.option('-c','--config', required=False, type=str, default='talos.yaml')
+def deploy(config):
     """Deploys the application"""
 
-    config_file_path = "talos.yaml"
+    config_file_path = config
     
     talos_config = {}
     
