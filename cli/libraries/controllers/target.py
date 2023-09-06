@@ -8,7 +8,7 @@ from libraries.adapters import portainerce
 def does_stack_exist(talos_config: dict) -> bool:
     
 
-    if talos_config['target']['name'] == 'portainerce':
+    if talos_config['deployment']['target']['name'] == 'portainerce':
             stack_exist = portainerce.does_stack_exist(talos_config)
             return stack_exist
     else:
@@ -16,7 +16,7 @@ def does_stack_exist(talos_config: dict) -> bool:
 
 def create_stack(talos_config: dict) -> bool:
     
-    if talos_config['target']['name'] == 'portainerce':
+    if talos_config['deployment']['target']['name'] == 'portainerce':
             result = portainerce.create_stack(talos_config)
             return result
     else:
@@ -24,7 +24,7 @@ def create_stack(talos_config: dict) -> bool:
 
 def update_stack(talos_config: dict) -> bool:
     
-    if talos_config['target']['name'] == 'portainerce':
+    if talos_config['deployment']['target']['name'] == 'portainerce':
             result = portainerce.update_stack(talos_config)
             return result
     else:

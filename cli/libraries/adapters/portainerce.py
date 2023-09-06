@@ -13,9 +13,9 @@ sys.path.append(".")
 def get_portainer_jwt(talos_config: dict) -> str:
     session = requests.Session()
 
-    portainer_url = talos_config['target']['portainer_url']
-    portainer_username = talos_config['target']['portainer_username']
-    portainer_password = talos_config['target']['portainer_password']
+    portainer_url = talos_config['deployment']['target']['portainer_url']
+    portainer_username = talos_config['deployment']['target']['portainer_username']
+    portainer_password = talos_config['deployment']['target']['portainer_password']
 
     # Login to portainer
     login_url = f"{portainer_url}/api/auth"
@@ -40,7 +40,7 @@ def does_stack_exist(talos_config) -> bool:
     session = requests.Session()
     jwt = get_portainer_jwt(talos_config)
     
-    portainer_url = talos_config['target']['portainer_url']
+    portainer_url = talos_config['deployment']['target']['portainer_url']
    
     # Get a list of stacks
     stacks_url = f"{portainer_url}/api/stacks"
@@ -71,7 +71,7 @@ def get_stack_id(talos_config) -> int:
     session = requests.Session()
     jwt = get_portainer_jwt(talos_config)
     
-    portainer_url = talos_config['target']['portainer_url']
+    portainer_url = talos_config['deployment']['target']['portainer_url']
    
     # Get a list of stacks
     stacks_url = f"{portainer_url}/api/stacks"
@@ -99,7 +99,7 @@ def create_stack(talos_config) -> bool:
     session = requests.Session()
     jwt = get_portainer_jwt(talos_config)
 
-    portainer_url = talos_config['target']['portainer_url']
+    portainer_url = talos_config['deployment']['target']['portainer_url']
 
     create_stack_url = f"{portainer_url}/api/stacks"
     
@@ -112,7 +112,7 @@ def create_stack(talos_config) -> bool:
                     "repositoryReferenceName": talos_config['repository']['repository_reference_name'],
     }
     
-    params = {'endpointId': talos_config['target']['portainer_endpoint_id'], 'type': 2, 'method': 'repository'}
+    params = {'endpointId': talos_config['deployment']['target']['portainer_endpoint_id'], 'type': 2, 'method': 'repository'}
 
     # Create Stack
     
@@ -137,7 +137,7 @@ def update_stack(talos_config) -> bool:
     session = requests.Session()
     jwt = get_portainer_jwt(talos_config)
 
-    portainer_url = talos_config['target']['portainer_url']
+    portainer_url = talos_config['deployment']['target']['portainer_url']
 
     # Update a stack's Git configs     
     update_stack_url = f"{portainer_url}/api/stacks/{stackid}/git"   
@@ -150,7 +150,7 @@ def update_stack(talos_config) -> bool:
                     "repositoryReferenceName": talos_config['repository']['repository_reference_name'],
     }
     
-    params = {'endpointId': talos_config['target']['portainer_endpoint_id']}
+    params = {'endpointId': talos_config['deployment']['target']['portainer_endpoint_id']}
 
     head = {'Authorization': 'Bearer {}'.format(jwt)}
     response = session.post(update_stack_url, headers=head, params=params, json=request_body)
@@ -176,7 +176,7 @@ def update_stack(talos_config) -> bool:
                     "repositoryReferenceName": talos_config['repository']['repository_reference_name'],
     }
     
-    params = {'endpointId': talos_config['target']['portainer_endpoint_id']}
+    params = {'endpointId': talos_config['deployment']['target']['portainer_endpoint_id']}
 
     head = {'Authorization': 'Bearer {}'.format(jwt)}
     response = session.put(deploy_stack_url, headers=head, params=params, json=request_body)
