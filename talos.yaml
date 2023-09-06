@@ -2,12 +2,26 @@ name: myapp
 
 type: microservice
 
+repository:
+  host: github
+  owner: mailuminatti
+  name: talos
+  repository_username: mailuminatti
+  repository_password: "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"
+  repository_reference_name: refs/heads/main
+
 ci: 
   name: gihub
   organization: miluminatti-org
 
 target: 
   name: portainerce
-  portainer_url: https://192.168.0.101:9443/ #https://portainer.miluminatti.com
+  portainer_url: https://portainer.miluminatti.com
   portainer_username: martin
   portainer_password: 'm55T*tw^QL5H'
+  portainer_endpoint_id: 2
+
+build:
+  sca:
+    failOn: high
+  dockerlint: true

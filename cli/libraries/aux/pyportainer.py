@@ -89,17 +89,23 @@ class PyPortainer():
             data=json.dumps(options), 
             headers={"Authorization": "Bearer {}".format(self.token)}, 
             verify=self.verifySSL)
-        return r.json()
-        
+        return r.json()   
         
     
+    # def get_stacks(self, endpoint):
+    #     r = requests.get(
+    #         self.portainer_endpoint + "/endpoints/{}/stacks".format(endpoint), 
+    #         headers={"Authorization": "Bearer {}".format(self.token)}, 
+    #         verify=self.verifySSL)
+    #     return r.json()
+
     def get_stacks(self, endpoint):
         r = requests.get(
-            self.portainer_endpoint + "/endpoints/{}/stacks".format(endpoint), 
+            self.portainer_endpoint + "/stacks", 
             headers={"Authorization": "Bearer {}".format(self.token)}, 
             verify=self.verifySSL)
         return r.json()
-        
+    
     def new_stack(self, endpoint, options):
         r = requests.post(
             self.portainer_endpoint + "/endpoints/{}/stacks".format(endpoint), 
