@@ -15,10 +15,11 @@ def cli_build():
     pass
 
 @click.command()
-def build():
+@click.option('-c','--config', required=False, type=str, default='talos.yaml')
+def build(config):
     """Runs build steps the application"""
 
-    config_file_path = "talos.yaml"
+    config_file_path = config
     
     talos_config = {}
     
