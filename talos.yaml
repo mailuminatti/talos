@@ -7,7 +7,7 @@ repository:
   owner: mailuminatti
   name: talos
   repository_username: mailuminatti
-  repository_password: "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"
+  repository_password: ${REPOSITORY_PASSWORD}
   repository_reference_name: refs/heads/main
 
 ci: 
@@ -19,7 +19,7 @@ deployment:
     name: portainerce
     portainer_url: https://portainer.miluminatti.com
     portainer_username: martin
-    portainer_password: 'm55T*tw^QL5H'
+    portainer_password: ${PORTAINER_PASSWORD}
     portainer_endpoint_id: 2
 
 build:
