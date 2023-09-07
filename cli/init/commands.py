@@ -2,6 +2,8 @@ import click
 import yaml
 import os
 
+from envyaml import EnvYAML
+
 # This sys.path.append is done to be able to import libraries from a higher level in the 
 # folder structure
 
@@ -9,6 +11,7 @@ import sys
 sys.path.append(".")
 
 from libraries.controllers import target
+from libraries import core
 
 @click.group()
 def cli_init():
@@ -21,11 +24,7 @@ def init():
 
     config_file_path = "talos.yaml"
     
-    talos_config = {}
-    
     if os.path.exists(config_file_path):
-        with open(config_file_path, 'r') as file:
-            talos_config = yaml.safe_load(file)
-
+        talos_config = core.load_talos_config(config_file_path)
 
 cli_init.add_command(init)
