@@ -9,6 +9,7 @@ import sys
 sys.path.append(".")
 
 from libraries.controllers import target
+from libraries import core
 
 @click.group()
 def cli_deploy():
@@ -24,8 +25,7 @@ def deploy(config):
     talos_config = {}
     
     if os.path.exists(config_file_path):
-        with open(config_file_path, 'r') as file:
-            talos_config = yaml.safe_load(file)
+        talos_config = core.load_talos_config(config_file_path)
     
     # Check if the application exists in the assigned Target
     app_exists = target.does_stack_exist(talos_config)
