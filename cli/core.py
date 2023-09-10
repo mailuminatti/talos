@@ -31,3 +31,10 @@ def load_talos_config(config_file_path:str) -> dict:
 
 
   return talos_config
+
+def get_repo_url(talos_config: dict) -> str:
+  vcs = talos_config['repository']['host']
+  owner = talos_config['repository']['owner']
+  name = talos_config['repository']['name']
+  repo_url = f'https://{vcs}.com/{owner}/{name}'
+  return repo_url  
