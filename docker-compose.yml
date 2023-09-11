@@ -1,0 +1,6 @@
+version: "3"
+services:
+  hello_world:
+    image: public.ecr.aws/pahudnet/nyancat-docker-image:latest
+    ports:
+    - 80:80
