@@ -1,9 +1,7 @@
 #!/bin/sh
 
 git clone https://github.com/mailuminatti/talos.git
-cd $(pwd)/talos
-git checkout talos-dev
-cd $(pwd)/cli
+cd $(pwd)/talos.cli
 echo "Installing Talos"
 pip3 install --editable .
 cd ../../
