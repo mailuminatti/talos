@@ -46,4 +46,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: $TALOS_VERSION
+          tags: ${{ env.TALOS_VERSION }}
