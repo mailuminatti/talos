@@ -1,7 +1,7 @@
 import click
 from deploy import deploy
 from build import build
-from version import __version__ as cliversion
+from __version__ import __version__ as cliversion
 
 # from service import commands as service
 
