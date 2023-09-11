@@ -2,6 +2,10 @@ import yaml
 from envyaml import EnvYAML
 import os
 import re
+import string
+import random
+import git
+from yaspin import yaspin
 
 path_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
@@ -38,3 +42,46 @@ def get_repo_url(talos_config: dict) -> str:
   name = talos_config['repository']['name']
   repo_url = f'https://{vcs}.com/{owner}/{name}'
   return repo_url  
+
+def get_random_string(length: int) -> str:
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
+def does_repo_exist(vcs: str, owner: str, name: str) -> bool:
+
+  repo_url = f'https://{vcs}.com/{owner}/{name}'
+
+  try:
+      folder = get_random_string(8)
+      git.Repo.clone_from(repo_url,f'/tmp/{folder}')
+      return True
+  
+  except git.exc.GitError:
+      return False
+
+# This creates the talos config object
+# not the file
+def create_talos_config(answers: dict) -> dict:
+   talos_config = {
+      'name': answers['service_name'],
+      'repository': {
+         'host': answers['repository'],
+         'owner': answers['owner_name'],
+         'name': answers['service_name'],
+      },
+      'ci': {
+         'name': answers['ci']
+      },
+      'deployments': {
+         'target': {
+            'name': answers['deployment_target'],
+         }
+      },
+      'build': {
+         'dockerlint' : False
+      }
+
+   }
+   return talos_config

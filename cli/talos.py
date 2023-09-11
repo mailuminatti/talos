@@ -1,24 +1,24 @@
 import click
-from deploy import deploy
-from build import build
+
+from command_deploy import deploy
+from command_build import build
+from command_service import service
+
 from __version__ import __version__ as cliversion
 
-# from service import commands as service
 
 @click.group()
-@click.pass_context
 @click.version_option(cliversion)
-def entry_point():
+
+def talos():
     pass
 
+talos.add_command(deploy)
+talos.add_command(build)
+talos.add_command(service)
 
 if __name__ == '__main__':
-    entry_point.add_command(deploy)
-    entry_point.add_command(build)
-    # entry_point.add_command(service.service)
-    entry_point()
+    talos()
 
 def cli_entry():
-    entry_point.add_command(deploy)
-    entry_point.add_command(build)
-    entry_point()
+    talos()
