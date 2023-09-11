@@ -1,0 +1,2 @@
+First scope (MVP): 
+Creation of a microservice, hosted in portainer, written in python

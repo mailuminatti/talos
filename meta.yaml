@@ -1,0 +1,20 @@
+supported:
+  repository:
+    - github
+    - bitbucket
+
+  ci:
+    - github
+
+  deployment:
+    target:
+      - portainerce
+      - docker
+
+    cd:
+      - github
+      - bitbucket
+
+  build_steps:
+    - sca
+    - dockerlint
