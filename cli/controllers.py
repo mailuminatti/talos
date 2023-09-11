@@ -3,15 +3,17 @@ import json
 from yaspin import yaspin
 import core
 import adapters
+import git
 
 class Controller:
-  def __init__(self, talos_config: dict):
-    self.talos_config = talos_config
+    pass
 
 #Use the Person class to create an object, and then execute the printname method:
 
 class Builder(Controller):
-    
+  def __init__(self, talos_config: dict):
+    self.talos_config = talos_config
+
     def build(self) -> bool:
 
         success = False
@@ -24,6 +26,8 @@ class Builder(Controller):
 
 
 class DeploymentTarget(Controller):
+  def __init__(self, talos_config: dict):
+    self.talos_config = talos_config
 
     def does_stack_exists(self) -> bool:
 
@@ -245,3 +249,16 @@ class PortainerCETarget(DeploymentTarget):
             raise Exception("Failed to create stack in Portainer")
         
         return success
+
+class Repository(Controller):
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+
+    def create_repository(self, talos_config: dict) -> bool:
+        return False
+
+class GithubRepository(Repository):
+    def create_repository(self, talos_config: dict) -> bool:
+        
+
+
