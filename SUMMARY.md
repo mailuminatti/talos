@@ -1,9 +1,9 @@
 # Table of contents
 
-* [👋 Welcome to A Product](README.md)
-
 ## Overview
 
+* [Talos](README.md)
+* [From 0 to Deploying in 30 Seconds](overview/from-0-to-deploying-in-30-seconds.md)
 * [💡 What we do](overview/what-we-do.md)
 * [✨ Our Features](overview/our-features.md)
 
