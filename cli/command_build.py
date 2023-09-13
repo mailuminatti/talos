@@ -2,6 +2,7 @@ import click
 import os
 import yaml
 import controllers
+import core
 
 @click.group()
 def cli_build():
@@ -16,7 +17,7 @@ def build(config):
     config_file_path = config
     talos_config = {}
     with open(config_file_path, 'r') as file:
-        talos_config = yaml.safe_load(file)
+        talos_config = core.load_talos_config(config_file_path)
     
     # Check if the application exists in the assigned Target
 

@@ -5,14 +5,14 @@ type: microservice
 repository:
   host: github
   owner: mailuminatti
-  name: talos
+  
+  name: myapp
   repository_username: mailuminatti
   repository_password: ${REPOSITORY_PASSWORD}
   repository_reference_name: refs/heads/main
 
 ci: 
   name: gihub
-  organization: miluminatti-org
 
 deployment:
   target: 

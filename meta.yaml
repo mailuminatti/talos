@@ -9,7 +9,8 @@ supported:
   deployment:
     target:
       - portainerce
-      - docker
+      - docker-local
+      - docker-remote
 
     cd:
       - github

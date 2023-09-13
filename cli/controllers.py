@@ -3,27 +3,41 @@ import json
 from yaspin import yaspin
 import core
 import adapters
+import git
+from github import Github
+from github import InputGitTreeElement
+from github import GithubException
+import os
+from git import Repo
+import click
+import subprocess
 
 class Controller:
-  def __init__(self, talos_config: dict):
-    self.talos_config = talos_config
+    pass
 
 #Use the Person class to create an object, and then execute the printname method:
 
 class Builder(Controller):
-    
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+
     def build(self) -> bool:
 
-        success = False
+        success = True
+        result_sca = True
 
         if 'sca' in self.talos_config['build']:
             sca_adapter = adapters.SCA(self.talos_config)
-            result = sca_adapter.run_sca(self.talos_config)
+            result_sca = sca_adapter.run_sca(self.talos_config)
 
+        success = success and result_sca
+        
         return success
 
 
 class DeploymentTarget(Controller):
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
 
     def does_stack_exists(self) -> bool:
 
@@ -62,7 +76,21 @@ class DeploymentTarget(Controller):
         return success
 
 class PortainerCETarget(DeploymentTarget):
-
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+        
+        if 'portainer_username' not in talos_config['deployment']['target']:
+            # If portainer_username is not specified, assumes that exists as an environment variable
+            talos_config['deployment']['target'].update(
+                {'portainer_username': os.environ['PORTAINER_USERNAME']}
+                )
+        if 'portainer_password' not in talos_config['deployment']['target']:
+            # If portainer_password is not specified, assumes that exists as an environment variable
+            talos_config['deployment']['target'].update(
+                {'portainer_username': os.environ['PORTAINER_PASSWORD']}
+                )
+        
+        
     def does_stack_exists(self) -> bool:
     
     # Create a session to handle authentication
@@ -245,3 +273,91 @@ class PortainerCETarget(DeploymentTarget):
             raise Exception("Failed to create stack in Portainer")
         
         return success
+
+class Repository(Controller):
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+
+    def create_repository(self) -> bool: #type: ignore
+        
+        success = False
+
+        if self.talos_config['repository']['host'] == 'github':
+            
+            github_controller = GithubRepository(self.talos_config)
+            
+            success = github_controller.create_repository()
+            
+            return success
+
+    def commit_initial_code(self, folder_source_code: str ) -> object: #type: ignore
+        
+        # TODO - Write on a Pythonic way
+        click.echo(os.getcwd())
+        
+        os.chdir(folder_source_code)
+        
+        os.system('git init')
+        
+        os.system('git add .')
+        
+        os.system('git branch -M main')
+
+        os.system(f'git remote add origin {core.get_repo_url(self.talos_config)}.git')
+        
+        os.system('git commit -m "initial commit"')
+        
+        os.system('git push -u origin main')
+        
+        os.chdir((os.path.dirname(os.getcwd())))
+        
+        return True
+
+class GithubRepository(Repository):
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+        
+        if 'repository_username' not in self.talos_config['repository']:
+            # If repository_username is not specified, assumes that exists as an environment variable
+            self.talos_config['repository'].update(
+                {'repository_username': os.environ['REPOSITORY_USERNAME']}
+                )
+
+        if 'repository_password' not in self.talos_config['repository']:
+            # If repository_password is not specified, assumes that exists as an environment variable
+            self.talos_config['repository'].update(
+                {'repository_password': os.environ['REPOSITORY_PASSWORD']}
+                )
+
+        if 'repository_reference_name' not in self.talos_config['repository']:
+            # If repository_reference_name is not specified, assumes that exists as an environment variable
+            self.talos_config['repository'].update(
+                {'repository_reference_name': 'refs/heads/main'}
+                )
+
+    def create_repository(self) -> object:
+        """Creates a new repository on GitHub.
+
+        Args:
+            talos_config: The object talos_config.
+
+        Returns:
+            Success of the operation as a bool.
+        """
+        g = Github(self.talos_config['repository']['repository_password'])
+
+        try:
+            # Create the repository
+            repo_name = self.talos_config['repository']['name']
+            user = g.get_user()
+            repo = user.create_repo(repo_name)
+            return repo
+        
+        except GithubException as gex:
+            if gex.status == 422:
+                click.echo('Resposity already exist. Skipping')
+                return True
+        except Exception as e:
+            
+            print(f"An error occurred: {str(e)}")
+            return False

@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["build", "--config", "/home/martin/Documents/GitHub/mailuminatti/_git/talos/talos.yaml"]
+            "args": ["service", "new"]
         }
     ]
 }

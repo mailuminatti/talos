@@ -15,6 +15,14 @@
           }
         ]
     },
+    "name": {
+      "title": "name",
+      "type" : "string"
+  },
+
+
+
+
     "ignored": {
       "type": "array",
       "description": "A list of rules to be ignored",

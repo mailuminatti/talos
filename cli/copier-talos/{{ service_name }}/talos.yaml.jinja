@@ -1,0 +1,25 @@
+name: {{service_name}}
+
+type: microservice
+
+repository:
+  host: {{repository}}
+  owner: {{owner_name}}  
+  name: {{service_name}}
+
+
+ci: 
+  name: gihub
+
+deployment:
+  target: 
+    name: {{deployment_target}}
+    {% if deployment_target == 'portainerce' -%}
+    portainer_url: {{portainer_url}}
+    {% endif %}
+
+
+build:
+  sca:
+    failOn: high
+  dockerlint: true
