@@ -5,4 +5,4 @@ deployment_target: portainerce
 owner_name: mailuminatti
 portainer_url: https://portainer.miluminatti.com
 repository: github
-service_name: myservice
+service_name: hello-world

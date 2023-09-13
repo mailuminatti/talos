@@ -1,0 +1,24 @@
+name: hello-world
+
+type: microservice
+
+repository:
+  host: github
+  owner: mailuminatti  
+  name: hello-world
+
+
+ci: 
+  name: gihub
+
+deployment:
+  target: 
+    name: portainerce
+    portainer_url: https://portainer.miluminatti.com
+    
+
+
+build:
+  sca:
+    failOn: high
+  dockerlint: true

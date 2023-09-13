@@ -4,6 +4,9 @@ from yaspin import yaspin
 import core
 import adapters
 import git
+from github import Github
+from github import InputGitTreeElement
+import os
 
 class Controller:
     pass
@@ -69,7 +72,21 @@ class DeploymentTarget(Controller):
         return success
 
 class PortainerCETarget(DeploymentTarget):
-
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+        
+        if 'portainer_username' not in talos_config['deployment']['target']:
+            # If portainer_username is not specified, assumes that exists as an environment variable
+            talos_config['deployment']['target'].update(
+                {'portainer_username': os.environ['PORTAINER_USERNAME']}
+                )
+        if 'portainer_password' not in talos_config['deployment']['target']:
+            # If portainer_password is not specified, assumes that exists as an environment variable
+            talos_config['deployment']['target'].update(
+                {'portainer_username': os.environ['PORTAINER_PASSWORD']}
+                )
+        
+        
     def does_stack_exists(self) -> bool:
     
     # Create a session to handle authentication
@@ -257,9 +274,123 @@ class Repository(Controller):
     def __init__(self, talos_config: dict):
         self.talos_config = talos_config
 
-    def create_repository(self, talos_config: dict) -> bool:
-        return False
-
-# class GithubRepository(Repository):
-#     def create_repository(self, talos_config: dict) -> bool:
+    def create_repository(self) -> bool: #type: ignore
         
+        success = False
+
+        if self.talos_config['repository']['host'] == 'github':
+            
+            github_controller = GithubRepository(self.talos_config)
+            
+            success = github_controller.create_repository()
+            
+            return success
+
+    def commit_initial_code(self, folder_source_code: str ) -> object: #type: ignore
+        
+        success = False
+
+        if self.talos_config['repository']['host'] == 'github':
+            
+            github_controller = GithubRepository(self.talos_config)
+            
+            success = github_controller.commit_initial_code(folder_source_code)
+            
+            return success
+
+class GithubRepository(Repository):
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
+        
+        if 'repository_username' not in self.talos_config['repository']:
+            # If repository_username is not specified, assumes that exists as an environment variable
+            self.talos_config['repository'].update(
+                {'repository_username': os.environ['REPOSITORY_USERNAME']}
+                )
+
+        if 'repository_password' not in self.talos_config['repository']:
+            # If repository_password is not specified, assumes that exists as an environment variable
+            self.talos_config['repository'].update(
+                {'repository_password': os.environ['REPOSITORY_PASSWORD']}
+                )
+
+        if 'repository_reference_name' not in self.talos_config['repository']:
+            # If repository_reference_name is not specified, assumes that exists as an environment variable
+            self.talos_config['repository'].update(
+                {'repository_reference_name': 'refs/heads/main'}
+                )
+
+    def create_repository(self) -> object:
+        """Creates a new repository on GitHub.
+
+        Args:
+            talos_config: The object talos_config.
+
+        Returns:
+            Success of the operation as a bool.
+        """
+        g = Github(self.talos_config['repository']['repository_password'])
+
+        try:
+            # Create the repository
+            repo_name = self.talos_config['repository']['name']
+            user = g.get_user()
+            repo = user.create_repo(repo_name)
+            return repo
+        
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return False
+
+    def commit_initial_code(self,folder_source_code: str) -> object:
+        
+        # Commit code from an existing folder
+        folder_path = folder_source_code
+        branch_name = 'main'
+        commit_message = 'Initial commit'
+
+        try:
+            g = Github(self.talos_config['repository']['repository_password'])
+            user = g.get_user()
+            repo_name = self.talos_config['repository']['name']
+            repo_owner = self.talos_config['repository']['owner']
+            repo_full_name = f"{repo_owner}/{repo_name}"
+            repo = user.get_repo(repo_name)
+            
+            branch = repo.bran
+            
+            branch = repo.get_branch(branch_name)
+            
+            # Create a Git tree with the files in the folder
+            tree = repo.get_git_tree(branch.commit.sha, recursive=True)
+            elements = []
+                
+            for root, _, files in os.walk(folder_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    with open(file_path, "rb") as file_content:
+                        data = file_content.read()
+                    
+                    # Create a blob for the file content
+                    blob = repo.create_git_blob(data, "base64") #type: ignore
+
+                    # Create a tree element for the file
+                    element = InputGitTreeElement(path=file_path, mode="100644", type="blob", sha=blob.sha)
+                    elements.append(element)
+
+            # Create a new tree with the elements
+            new_tree = repo.create_git_tree(elements)
+
+            # Create a new commit
+            parent = repo.get_git_commit(branch.commit.sha)
+            commit = repo.create_git_commit(commit_message, new_tree, [parent])
+
+            # Update the branch reference
+            ref = repo.get_git_ref(f"heads/{branch_name}")
+            ref.edit(commit.sha)
+
+            return True
+    
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return False

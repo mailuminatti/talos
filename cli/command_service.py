@@ -24,9 +24,21 @@ def new():
 
     click.echo("🚀 Let's create a new service")
     
-    copier.run_copy("cli/copier-talos", "cli")
+    copier.run_copy("cli/copier-talos", ".")
+    
+    with open('.copier-answers.yml', 'r') as file:
+        copier_answers = yaml.safe_load(file)
 
- 
+    service_name = copier_answers['service_name']
+        
+    talos_config = core.load_talos_config(f'{service_name}/talos.yaml')
+
+    repo_controller = controllers.Repository(talos_config)
+    
+    #result = repo_controller.create_repository()
+    
+    commit = repo_controller.commit_initial_code(copier_answers['service_name'])
+    talos_config = talos_config
 
 
 def is_valid_slug(answers, current):
