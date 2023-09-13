@@ -24,15 +24,15 @@ def deploy(config):
     
     # Check if the application exists in the assigned Target
     
-    deployment_target = controllers.DeploymentTarget('deployment_target',talos_config)
+    deployment_target = controllers.DeploymentTarget(talos_config)
     
 
-    app_exists = deployment_target.does_stack_exists(talos_config)
+    app_exists = deployment_target.does_stack_exists()
 
     if app_exists:
-        result = deployment_target.update_stack(talos_config)
+        result = deployment_target.update_stack()
     else:
-        result = deployment_target.create_stack(talos_config)
+        result = deployment_target.create_stack()
 
     return result
 

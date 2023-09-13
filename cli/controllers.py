@@ -11,23 +11,26 @@ class Controller:
 #Use the Person class to create an object, and then execute the printname method:
 
 class Builder(Controller):
-  def __init__(self, talos_config: dict):
-    self.talos_config = talos_config
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
 
     def build(self) -> bool:
 
-        success = False
+        success = True
+        result_sca = True
 
         if 'sca' in self.talos_config['build']:
             sca_adapter = adapters.SCA(self.talos_config)
-            result = sca_adapter.run_sca(self.talos_config)
+            result_sca = sca_adapter.run_sca(self.talos_config)
 
+        success = success and result_sca
+        
         return success
 
 
 class DeploymentTarget(Controller):
-  def __init__(self, talos_config: dict):
-    self.talos_config = talos_config
+    def __init__(self, talos_config: dict):
+        self.talos_config = talos_config
 
     def does_stack_exists(self) -> bool:
 
