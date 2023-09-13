@@ -6,7 +6,11 @@ import adapters
 import git
 from github import Github
 from github import InputGitTreeElement
+from github import GithubException
 import os
+from git import Repo
+import click
+import subprocess
 
 class Controller:
     pass
@@ -288,15 +292,26 @@ class Repository(Controller):
 
     def commit_initial_code(self, folder_source_code: str ) -> object: #type: ignore
         
-        success = False
+        # TODO - Write on a Pythonic way
+        click.echo(os.getcwd())
+        
+        os.chdir(folder_source_code)
+        
+        os.system('git init')
+        
+        os.system('git add .')
+        
+        os.system('git branch -M main')
 
-        if self.talos_config['repository']['host'] == 'github':
-            
-            github_controller = GithubRepository(self.talos_config)
-            
-            success = github_controller.commit_initial_code(folder_source_code)
-            
-            return success
+        os.system(f'git remote add origin {core.get_repo_url(self.talos_config)}.git')
+        
+        os.system('git commit -m "initial commit"')
+        
+        os.system('git push -u origin main')
+        
+        os.chdir((os.path.dirname(os.getcwd())))
+        
+        return True
 
 class GithubRepository(Repository):
     def __init__(self, talos_config: dict):
@@ -338,59 +353,11 @@ class GithubRepository(Repository):
             repo = user.create_repo(repo_name)
             return repo
         
+        except GithubException as gex:
+            if gex.status == 422:
+                click.echo('Resposity already exist. Skipping')
+                return True
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            return False
-
-    def commit_initial_code(self,folder_source_code: str) -> object:
-        
-        # Commit code from an existing folder
-        folder_path = folder_source_code
-        branch_name = 'main'
-        commit_message = 'Initial commit'
-
-        try:
-            g = Github(self.talos_config['repository']['repository_password'])
-            user = g.get_user()
-            repo_name = self.talos_config['repository']['name']
-            repo_owner = self.talos_config['repository']['owner']
-            repo_full_name = f"{repo_owner}/{repo_name}"
-            repo = user.get_repo(repo_name)
             
-            branch = repo.bran
-            
-            branch = repo.get_branch(branch_name)
-            
-            # Create a Git tree with the files in the folder
-            tree = repo.get_git_tree(branch.commit.sha, recursive=True)
-            elements = []
-                
-            for root, _, files in os.walk(folder_path):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    with open(file_path, "rb") as file_content:
-                        data = file_content.read()
-                    
-                    # Create a blob for the file content
-                    blob = repo.create_git_blob(data, "base64") #type: ignore
-
-                    # Create a tree element for the file
-                    element = InputGitTreeElement(path=file_path, mode="100644", type="blob", sha=blob.sha)
-                    elements.append(element)
-
-            # Create a new tree with the elements
-            new_tree = repo.create_git_tree(elements)
-
-            # Create a new commit
-            parent = repo.get_git_commit(branch.commit.sha)
-            commit = repo.create_git_commit(commit_message, new_tree, [parent])
-
-            # Update the branch reference
-            ref = repo.get_git_ref(f"heads/{branch_name}")
-            ref.edit(commit.sha)
-
-            return True
-    
-        except Exception as e:
             print(f"An error occurred: {str(e)}")
             return False

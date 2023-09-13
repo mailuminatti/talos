@@ -1,8 +1,0 @@
-_src_path: cli/copier-talos
-cd: github
-ci: github
-deployment_target: portainerce
-owner_name: mailuminatti
-portainer_url: https://portainer.miluminatti.com
-repository: github
-service_name: hello-world
