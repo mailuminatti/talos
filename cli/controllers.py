@@ -257,8 +257,6 @@ class Repository(Controller):
     def create_repository(self, talos_config: dict) -> bool:
         return False
 
-class GithubRepository(Repository):
-    def create_repository(self, talos_config: dict) -> bool:
+# class GithubRepository(Repository):
+#     def create_repository(self, talos_config: dict) -> bool:
         
-
-

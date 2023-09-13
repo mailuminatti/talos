@@ -1,0 +1,62 @@
+# internal variables
+_talos:
+  type: str
+  value: talos
+
+# questions
+service_name:
+  type: str
+  help: What's the name of the new service?
+
+repository:
+  type: str
+  help: Where is your code going to be hosted?
+  choices:
+      - github
+      - bitbucket
+      - gitea
+  default: github
+
+owner_name:
+  type: str
+  help: Who's going to be the owner of {{ repository }} ? (organization or username)
+
+ci:
+  type: str
+  help: What Continuous Integration service do you want to use?
+  choices:
+    Github Actions: github
+    Bitbucket Pipelines: bitbucket
+    CircleCI: circleci
+  default: github
+
+cd:
+  type: str
+  help: What Continuous Delivery service do you want to use?
+  choices:
+    Github Actions: github
+    Bitbucket Deployments: bitbucket
+    CodeDeploy: codedeploy
+  default: github
+
+deployment_target:
+  type: str
+  help: Where is the service going to be deployed?
+  choices:
+    Portainer Community Edition: portainerce
+    Local Docker: docker-local
+    Remote Docker: docker-remote
+  default: portainerce
+
+portainer_url:
+  type: str
+  help: What's Portainer's url?
+  default: https://portainer.miluminatti.com
+  when: "{{ deployment_target == 'portainerce' }}"
+
+_message_after_copy: |
+    Your project "{{ service_name }}" has been created successfully!
+
+    Next steps:
+
+    TBC
