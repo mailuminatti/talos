@@ -25,4 +25,4 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Obtain Talos version
-        run: --version
+        run: talos --version
