@@ -15,6 +15,7 @@ RUN rm -rf __pycache__ && \
     rm -rf *.pyc && \
     rm -rf tests
 
-RUN pip install  /app/cli
+WORKDIR /app/cli
+RUN pip install .
 WORKDIR /talos
 ENTRYPOINT ["/usr/local/bin/talos"]
