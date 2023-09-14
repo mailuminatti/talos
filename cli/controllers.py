@@ -1,6 +1,6 @@
 import requests
 import json
-from yaspin import yaspin
+
 import core
 import adapters
 import git
@@ -183,9 +183,7 @@ class PortainerCETarget(DeploymentTarget):
 
     def update_stack(self) -> bool:
         
-        spinner = yaspin(text="Updating Stack", color="yellow")
-        spinner.start()    
-        
+        logger.info('Updating Stack')        
         stackid = self.get_stack_id()
         
         session = requests.Session()
@@ -210,15 +208,13 @@ class PortainerCETarget(DeploymentTarget):
         response = session.post(update_stack_url, headers=head, params=params, json=request_body)
         
         if response.status_code != 200:
-            spinner.fail("❌")
-            print("Failed to update stack in Portainer.")
+            logger.error('Failed to update stack in Portainer.')
             raise Exception("Failed to update stack in Portainer")
         else:
-            spinner.ok("✅")
+            logger.info('Stack updated in portainer')
 
         # Force redeploy 
-        spinner = yaspin(text="Deploying Stack", color="yellow")
-        spinner.start()
+        logger.info('Deploying stack in Portainer')
         deploy_stack_url = f"{portainer_url}/api/stacks/{stackid}/git/redeploy"   
     
         
@@ -236,12 +232,11 @@ class PortainerCETarget(DeploymentTarget):
         response = session.put(deploy_stack_url, headers=head, params=params, json=request_body)
         
         if response.status_code != 200:
-            spinner.fail("❌")
-            print("Failed to deploy stack in Portainer.")
+            logger.error('Failed to deploy stack in Portainer')
             raise Exception("Failed to deploy stack in Portainer")
             return False    
         else:
-            spinner.ok("✅")
+            logger.error('Deployed stack in Portainer')
             return True
 
     def create_stack(self) -> bool:

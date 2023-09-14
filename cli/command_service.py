@@ -6,7 +6,7 @@ import re
 from typing import List
 import controllers
 import core
-from yaspin import yaspin
+
 from loguru import logger
 from dotenv import load_dotenv
 import copier
