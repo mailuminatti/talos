@@ -14,8 +14,16 @@ exec(open(version_path).read())
 
 setup(
     name='talos',
+    include_package_data=True,
     version=__version__, # type: ignore
-    packages=find_packages(),
+    py_modules=[
+        'command_deploy', 
+        'command_build',
+        'command_service',
+        'controllers', 
+        'core', 
+        'adapters',
+        '__version__'],
     install_requires=install_requires,
     entry_points={
         'console_scripts': [

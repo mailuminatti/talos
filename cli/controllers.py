@@ -11,6 +11,9 @@ import os
 from git import Repo
 import click
 import subprocess
+from loguru import logger
+from dotenv import load_dotenv
+
 
 class Controller:
     pass
@@ -317,16 +320,22 @@ class GithubRepository(Repository):
     def __init__(self, talos_config: dict):
         self.talos_config = talos_config
         
+        
+        logger.debug("Loading environment variables from .env")
+        if os.path.isfile('.env'):
+            load_dotenv()
+        logger.debug("Checking if REPOSITORY_USERNAME exists")
         if 'repository_username' not in self.talos_config['repository']:
             # If repository_username is not specified, assumes that exists as an environment variable
+            logger.debug("Adding repository_username to talos_config")
             self.talos_config['repository'].update(
-                {'repository_username': os.environ['REPOSITORY_USERNAME']}
+                {'repository_username': os.getenv('REPOSITORY_USERNAME')}
                 )
 
         if 'repository_password' not in self.talos_config['repository']:
             # If repository_password is not specified, assumes that exists as an environment variable
             self.talos_config['repository'].update(
-                {'repository_password': os.environ['REPOSITORY_PASSWORD']}
+                {'repository_password': os.getenv('REPOSITORY_PASSWORD')}
                 )
 
         if 'repository_reference_name' not in self.talos_config['repository']:
@@ -344,19 +353,19 @@ class GithubRepository(Repository):
         Returns:
             Success of the operation as a bool.
         """
+        
         g = Github(self.talos_config['repository']['repository_password'])
 
         try:
             # Create the repository
-            repo_name = self.talos_config['repository']['name']
-            user = g.get_user()
-            repo = user.create_repo(repo_name)
-            return repo
-        
-        except GithubException as gex:
-            if gex.status == 422:
-                click.echo('Resposity already exist. Skipping')
-                return True
+            # TODO do the implementation of creating a new github repo
+            # in a more pythonic way
+            logger.info(f'Creating new repository {self.talos_config["name"]}')
+            
+            os.system('gh auth login')
+            
+            os.system(f'gh repo create {self.talos_config["name"]} --private')
+
         except Exception as e:
             
             print(f"An error occurred: {str(e)}")

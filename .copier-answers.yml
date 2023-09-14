@@ -1,0 +1,9 @@
+_commit: 86bd7e0
+_src_path: https://github.com/mailuminatti/talos-copier
+cd: github
+ci: github
+deployment_target: portainerce
+owner_name: mailuminatti
+portainer_url: https://portainer.miluminatti.com
+repository: github
+service_name: test123

@@ -7,7 +7,8 @@ from typing import List
 import controllers
 import core
 from yaspin import yaspin
-
+from loguru import logger
+from dotenv import load_dotenv
 import copier
 
 
@@ -18,15 +19,23 @@ def service():
 @service.command()
 def new():
 
+    logger.debug("Loading environment variables from .env")
+    if os.path.isfile('.env'):
+        load_dotenv()
+        
+    logger.debug("Running service new command")
     if os.path.isfile(f"{os.getcwd()}/talos.yaml"):
         print("A talos.yaml file already exists!")
         raise Exception("A talos.yaml file already exists!")
 
     click.echo("🚀 Let's create a new service")
     
-    # Run questionaire
-    copier.run_copy("cli/copier-talos", ".")
     
+    # Run questionaire
+    logger.debug("Launching quesionnaire with copier")
+    copier.run_copy("https://github.com/mailuminatti/talos-copier", os.getcwd())
+    
+    logger.debug("Loading answers from previously asked questions")
     with open('.copier-answers.yml', 'r') as file:
         copier_answers = yaml.safe_load(file)
 
@@ -40,8 +49,9 @@ def new():
     # Create repository
     result = repo_controller.create_repository()
     
+    logger.info(f"Commiting code to {talos_config['name']}")
     commit = repo_controller.commit_initial_code(copier_answers['service_name'])
-    talos_config = talos_config
+
 
 
 def is_valid_slug(answers, current):
