@@ -5,7 +5,6 @@ import re
 import string
 import random
 import git
-from yaspin import yaspin
 
 path_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
