@@ -26,7 +26,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Obtain Talos version
         run: |
-          export TALOS_VERSION=$(grep -oP "__version__ = '\K\d+\.\d+\.\d+" cli/version.py)
+          export TALOS_VERSION=$(grep -oP "__version__ = '\K\d+\.\d+\.\d+" cli/__version__.py)
           echo "TALOS_VERSION=$TALOS_VERSION" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
