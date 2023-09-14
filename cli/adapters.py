@@ -1,8 +1,7 @@
 
 import docker
 import os
-from yaspin import yaspin
-
+from loguru import logger
 
 class Adapter:
     pass
@@ -13,8 +12,7 @@ class SCA(Adapter):
     
     def run_sca(self, talos_config: dict) -> bool:
         
-        spinner = yaspin(text="Running SCA", color="yellow")
-        spinner.start()
+        logger.info('Running SCA')
         
         failon = 'high'
         if 'failOn' in talos_config['build']['sca']:
@@ -44,8 +42,8 @@ class SCA(Adapter):
         container.remove() # type: ignore
         
         if exit_code==0:
-            spinner.ok("✅")        
+            logger.info('Finnished Running SCA')
             return True
         else:
-            spinner.fail("❌")
+            logger.error('Finished running SCA with errors')
             return False
