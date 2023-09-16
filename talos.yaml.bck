@@ -12,7 +12,7 @@ repository:
   repository_reference_name: refs/heads/main
 
 ci: 
-  name: gihub
+  name: github
 
 deployment:
   target: 
