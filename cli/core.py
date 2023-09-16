@@ -5,6 +5,7 @@ import re
 import string
 import random
 import git
+from loguru import logger
 
 path_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
@@ -84,3 +85,22 @@ def create_talos_config(answers: dict) -> dict:
 
    }
    return talos_config
+
+def validate_required_software() -> None:
+   
+   
+   if not is_tool('python3'):
+      raise Exception('Python 3 is not installed')
+   
+   if not is_tool('docker'):
+      raise Exception('Docker is not installed')
+   
+   if not is_tool('git'):
+      raise Exception('Git is not installed')
+
+def is_tool(name):
+   """Check whether `name` is on PATH and marked as executable."""
+   from shutil import which
+
+   logger.debug(f'Checking if {name} is installed')
+   return which(name) is not None

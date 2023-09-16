@@ -4,6 +4,8 @@ from command_deploy import deploy
 from command_build import build
 from command_service import service
 
+import core
+
 from __version__ import __version__ as cliversion
 
 from loguru import logger
@@ -14,6 +16,7 @@ import os.path
 @click.version_option(cliversion)
 
 def talos():
+    core.validate_required_software()
     pass
 
 talos.add_command(deploy)
