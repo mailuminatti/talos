@@ -17,6 +17,7 @@ setup(
     include_package_data=True,
     version=__version__, # type: ignore
     py_modules=[
+        'talos',
         'command_deploy', 
         'command_build',
         'command_service',
