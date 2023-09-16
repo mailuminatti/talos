@@ -2,6 +2,7 @@
 import docker
 import os
 from loguru import logger
+import core
 
 class Adapter:
     pass
@@ -18,7 +19,7 @@ class SCA(Adapter):
         if 'failOn' in talos_config['build']['sca']:
             failon = talos_config['build']['sca']['failOn']
 
-        client = docker.from_env()
+        client = core.get_docker_client()
         container_config = {
             'image': 'anchore/grype',  
             'volumes': {
