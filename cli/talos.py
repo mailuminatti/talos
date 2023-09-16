@@ -16,7 +16,7 @@ import os.path
 @click.version_option(cliversion)
 
 def talos():
-    core.validate_required_software()
+    core.initial_validations()
     pass
 
 talos.add_command(deploy)

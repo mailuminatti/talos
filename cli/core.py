@@ -6,15 +6,16 @@ import string
 import random
 import git
 from loguru import logger
+import docker
 
 path_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
 def path_constructor(loader, node):
-  ''' Extract the matched value, expand env variable, and replace the match '''
-  value = node.value
-  match = path_matcher.match(value)
-  env_var = match.group()[2:-1] # type: ignore
-  return os.environ.get(env_var) + value[match.end():] # type: ignore
+   ''' Extract the matched value, expand env variable, and replace the match '''
+   value = node.value
+   match = path_matcher.match(value)
+   env_var = match.group()[2:-1] # type: ignore
+   return os.environ.get(env_var) + value[match.end():] # type: ignore
 
 
 def load_talos_config(config_file_path:str) -> dict:
@@ -55,10 +56,10 @@ def does_repo_exist(vcs: str, owner: str, name: str) -> bool:
 
   try:
       folder = get_random_string(8)
-      git.Repo.clone_from(repo_url,f'/tmp/{folder}')
+      git.Repo.clone_from(repo_url,f'/tmp/{folder}') #type: ignore
       return True
   
-  except git.exc.GitError:
+  except git.exc.GitError: #type: ignore
       return False
 
 # This creates the talos config object
@@ -86,14 +87,24 @@ def create_talos_config(answers: dict) -> dict:
    }
    return talos_config
 
-def validate_required_software() -> None:
-   
-   
-   if not is_tool('python3'):
-      raise Exception('Python 3 is not installed')
+def initial_validations() -> None:
+
+   isDockerDesktop = False
    
    if not is_tool('docker'):
       raise Exception('Docker is not installed')
+   
+   client = get_docker_client()
+
+   try:
+      client.containers.list()
+   except Exception as e:
+      raise Exception("Couldn't connect to Docker socket. Is docker running?")
+      
+   
+   if not is_tool('python3'):
+      raise Exception('Python 3 is not installed')
+
    
    if not is_tool('git'):
       raise Exception('Git is not installed')
@@ -104,3 +115,13 @@ def is_tool(name):
 
    logger.debug(f'Checking if {name} is installed')
    return which(name) is not None
+
+def get_docker_client() -> docker.DockerClient:
+      
+   user = os.getlogin()
+   try:
+      client = docker.DockerClient(base_url=f'unix://home/{user}/.docker/desktop/docker.sock')
+   except Exception as e:
+      client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+      
+   return client
