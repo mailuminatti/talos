@@ -7,6 +7,10 @@ import random
 import git
 from loguru import logger
 import docker
+from pathlib import Path
+
+global feature_flags
+feature_flags = []
 
 path_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
@@ -87,27 +91,46 @@ def create_talos_config(answers: dict) -> dict:
    }
    return talos_config
 
-def initial_validations() -> None:
-
-   isDockerDesktop = False
+def initialization() -> None:
    
-   if not is_tool('docker'):
-      raise Exception('Docker is not installed')
    
-   client = get_docker_client()
-
-   try:
-      client.containers.list()
-   except Exception as e:
-      raise Exception("Couldn't connect to Docker socket. Is docker running?")
+   #Check if the Talos home folder exists. If not, it creates it
+   talos_home = os.path.join(Path.home(), '.talos')
+   
+   if not os.path.isdir(talos_home):
+      os.mkdir(talos_home)
+   
+   #If feature_flags file doesnt exists, create it
+   with open(os.path.join(talos_home,'feature_flags'), 'a'): pass
+   
+   #Read the feature_flags file
+   with open(os.path.join(talos_home, 'feature_flags'),"r") as f:
+      feature_flags = f.read().splitlines()
+ 
+   if 'skip_software_check' not in feature_flags:
       
-   
-   if not is_tool('python3'):
-      raise Exception('Python 3 is not installed')
+      if not is_tool('docker'):
+         raise Exception('Docker is not installed')
+      
+      client = get_docker_client()
 
+      try:
+         client.containers.list()
+      except Exception as e:
+         raise Exception("Couldn't connect to Docker socket. Is docker running?")
+         
+      
+      if not is_tool('python3'):
+         raise Exception('Python 3 is not installed')
+
+      
+      if not is_tool('git'):
+         raise Exception('Git is not installed')
+
+      if not is_tool('copilot'):
+         raise Exception('Copilot is not installed')
    
-   if not is_tool('git'):
-      raise Exception('Git is not installed')
+   
 
 def is_tool(name):
    """Check whether `name` is on PATH and marked as executable."""
@@ -120,8 +143,9 @@ def get_docker_client() -> docker.DockerClient:
       
    user = os.getlogin()
    try:
-      client = docker.DockerClient(base_url=f'unix://home/{user}/.docker/desktop/docker.sock')
-   except Exception as e:
       client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+   except Exception as e:
+      client = docker.DockerClient(base_url=f'unix://home/{user}/.docker/desktop/docker.sock')
+      
       
    return client
