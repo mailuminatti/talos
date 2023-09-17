@@ -21,6 +21,7 @@ setup(
         'command_deploy', 
         'command_build',
         'command_service',
+        'command_flag',
         'controllers', 
         'core', 
         'adapters',
