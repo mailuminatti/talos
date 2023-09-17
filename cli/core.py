@@ -2,12 +2,15 @@ import yaml
 from envyaml import EnvYAML
 import os
 import re
+import stat
 import string
 import random
+import shutil
 import git
 from loguru import logger
 import docker
 from pathlib import Path
+import urllib.request
 
 global feature_flags
 feature_flags = []
@@ -106,7 +109,10 @@ def initialization() -> None:
    #Read the feature_flags file
    with open(os.path.join(talos_home, 'feature_flags'),"r") as f:
       feature_flags = f.read().splitlines()
- 
+   
+   
+   
+   #If the feature flag is on, skip all the software check
    if 'skip_software_check' not in feature_flags:
       
       if not is_tool('docker'):
@@ -114,9 +120,7 @@ def initialization() -> None:
       
       client = get_docker_client()
 
-      try:
-         client.containers.list()
-      except Exception as e:
+      if not client:
          raise Exception("Couldn't connect to Docker socket. Is docker running?")
          
       
@@ -128,9 +132,16 @@ def initialization() -> None:
          raise Exception('Git is not installed')
 
       if not is_tool('copilot'):
-         raise Exception('Copilot is not installed')
-   
-   
+         logger.info('AWS Copilot CLI not found')
+         install_tool_with_url(
+            "https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux",            
+            'AWS Copilot CLI',
+            'copilot'
+         )
+      if not is_tool('sam'):
+         logger.info('AWS SAM CLI not found')
+         raise Exception('Git is not installed')
+         
 
 def is_tool(name):
    """Check whether `name` is on PATH and marked as executable."""
@@ -139,13 +150,19 @@ def is_tool(name):
    logger.debug(f'Checking if {name} is installed')
    return which(name) is not None
 
-def get_docker_client() -> docker.DockerClient:
+def get_docker_client() -> docker.DockerClient: #type: ignore
       
    user = os.getlogin()
    try:
       client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+      return client
    except Exception as e:
       client = docker.DockerClient(base_url=f'unix://home/{user}/.docker/desktop/docker.sock')
-      
-      
-   return client
+      return client
+
+def install_tool_with_url(url, tool_name, binary_name):
+   logger.info(f'{tool_name} not found. Installing it')
+   urllib.request.urlretrieve(url, binary_name)
+   os.chmod(binary_name,stat.S_IRWXU)         
+   shutil.move( os.path.join(os.getcwd(),binary_name),  os.path.join(Path.home(),'.local','bin'))
+   logger.debug(f'{tool_name} installed')
