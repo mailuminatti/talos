@@ -12,6 +12,7 @@ import docker
 from pathlib import Path
 import urllib.request
 
+
 global feature_flags
 feature_flags = []
 
@@ -110,24 +111,22 @@ def initialization() -> None:
    with open(os.path.join(talos_home, 'feature_flags'),"r") as f:
       feature_flags = f.read().splitlines()
    
-   
-   
    #If the feature flag is on, skip all the software check
+
    if 'skip_software_check' not in feature_flags:
       
       if not is_tool('docker'):
          raise Exception('Docker is not installed')
       
-      client = get_docker_client()
-
-      if not client:
+      try:
+         client = get_docker_client()
+      except Exception as e:
          raise Exception("Couldn't connect to Docker socket. Is docker running?")
          
       
       if not is_tool('python3'):
          raise Exception('Python 3 is not installed')
 
-      
       if not is_tool('git'):
          raise Exception('Git is not installed')
 
@@ -141,7 +140,6 @@ def initialization() -> None:
       if not is_tool('sam'):
          logger.info('AWS SAM CLI not found')
          raise Exception('Git is not installed')
-         
 
 def is_tool(name):
    """Check whether `name` is on PATH and marked as executable."""
@@ -155,9 +153,9 @@ def get_docker_client() -> docker.DockerClient: #type: ignore
    user = os.getlogin()
    try:
       client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-      return client
+
    except Exception as e:
-      client = docker.DockerClient(base_url=f'unix://home/{user}/.docker/desktop/docker.sock')
+      client = docker.DockerClient(base_url=f'unix://home/{user}/.docker/desktop/docker.sock     
       return client
 
 def install_tool_with_url(url, tool_name, binary_name):
