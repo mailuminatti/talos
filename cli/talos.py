@@ -3,6 +3,7 @@ import click
 from command_deploy import deploy
 from command_build import build
 from command_service import service
+from command_flag import flag
 
 import core
 
@@ -16,12 +17,14 @@ import os.path
 @click.version_option(cliversion)
 
 def talos():
-    core.initial_validations()
+    core.initialization()
+    
     pass
-
+    
 talos.add_command(deploy)
 talos.add_command(build)
 talos.add_command(service)
+talos.add_command(flag)
 
 if __name__ == '__main__':
     talos()
